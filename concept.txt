@@ -1,0 +1,40 @@
+I just wanted to check in and see if my project idea sounds okay. 
+I'm thinking of developing a "Cosy Car System" that would allow us to monitor the interior temperature (DHT 22) 
+ of the car and use a motion sensor (hopefully the one we have) to detect either movement of the car or activity around the car. 
+This could be useful for security purposes, particularly to help with theft prevention.
+
+
+db schema:
+CREATE DATABASE autosiren;
+
+USE autosiren;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT NOT NULL AUTO_INCREMENT,
+    google_id VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    name VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE temperature_logs (
+    id INT NOT NULL AUTO_INCREMENT,
+    temperature FLOAT NOT NULL,
+    humidity FLOAT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE motion_logs (
+    id INT NOT NULL AUTO_INCREMENT,
+    motion_detected BOOLEAN NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE led_status (
+    id INT NOT NULL AUTO_INCREMENT,
+    status ENUM('ON', 'OFF') NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);

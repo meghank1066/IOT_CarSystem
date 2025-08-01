@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h1>Login to Your Car App</h1>
+  <div>
+    <p>Please log in with Facebook to continue:</p>
+    
+    <fb:login-button
+        scope="public_profile,email"
+        onlogin="checkLoginState();">
+    </fb:login-button>
+  </div>
+
+  <script>
+    function checkLoginState() {
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+    }
+
+    function statusChangeCallback(response) {
+      console.log('Facebook login status:', response);
+
+      if (response.status === 'connected') {
+        const accessToken = response.authResponse.accessToken;
+
+        fetch('/facebook_login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken: accessToken })
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('User data:', data);
+        })
+        .catch(error => console.error('Error:', error));
+      } else {
+        console.log('User not logged in');
+      }
+    }
+  </script>
+{% endblock %}

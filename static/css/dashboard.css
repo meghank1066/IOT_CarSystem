@@ -1,0 +1,256 @@
+body {
+    background-image: url('/static/images/scales.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: #f1f1f1;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #fff !important;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+h3, h4, p
+{
+    color: #fff !important;
+}
+
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    width: 90%;
+    padding: 30px;
+    background: rgb(19 23 35 / 72%);
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    gap: 20px;
+}
+
+.dashboard {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+.left-section,
+.right-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: rgb(33 28 43 / 80%);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.left-section {
+    align-items: center;
+}
+
+.left-section img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.temperature,
+.motion-detection,
+.cooling-system {
+    padding: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: linear-gradient(135deg, #292433d4 30%, #191b1fde 100%);
+    min-height: 150px;
+}
+
+.temperature:hover,
+.motion-detection:hover,
+.cooling-system:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.temperature {
+    padding: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    text-align: left;
+    background: linear-gradient(135deg, #292433d4 30%, #191b1fde 100%);
+    color: #f1f1f1;
+}
+
+.temperature h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.data-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    justify-content: center
+}
+
+.data-row svg {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    fill: #03a9f4;
+}
+
+.data-row h4 {
+    font-size: 1.2rem;
+    margin: 0;
+    color: #f1f1f1;
+}
+
+span {
+    color: #03a9f4;
+    font-weight: bold;
+}
+
+
+svg {
+    margin-bottom: 15px;
+    width: 60px;
+    height: 60px;
+    fill: #03a9f4;
+}
+
+span {
+    color: #03a9f4;
+    font-weight: bold;
+}
+
+p {
+    font-size: 1rem;
+    color: #90a4ae;
+}
+
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .left-section,
+    .right-section {
+        flex: unset;
+        width: 100%;
+    }
+
+    svg {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+
+/* nav /*
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 250px;
+    background: linear-gradient(135deg, #292433 30%, #191b1f);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar-header h2 {
+    font-size: 1.8rem;
+    color: #f1f1f1;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.nav-links li {
+    margin-bottom: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #f1f1f1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: #03a9f4;
+    color: #fff;
+    transform: translateX(10px);
+}
+
+.nav-links i {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    color: #03a9f4;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover i,
+.nav-links a.active i {
+    color: #fff;
+}
+
+.container {
+    margin-left: 270px; /* Adjust based on sidebar width */
+    padding: 20px;
+}
+
+/* Responsive Sidebar */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .container {
+        margin-left: 220px;
+    }
+
+    .nav-links a {
+        font-size: 0.9rem;
+    }
+}

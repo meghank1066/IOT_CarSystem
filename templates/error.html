@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container mt-5">
+    <div class="alert alert-danger text-center" role="alert">
+        <h1 class="display-4">Error</h1>
+        <p class="lead">{{ message }}</p>
+        <img alt="Error" src="/static/error.webp" class="img-fluid mt-3">
+    </div>
+</div>
+{% endblock %}
