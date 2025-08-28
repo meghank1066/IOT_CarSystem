@@ -3,9 +3,9 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6 left-section">
+            {% if session.email %}
             <div class="myvehicle mb-4">
                 <h1 class="mb-4">My Vehicle</h1>
-                <a href="{{ url_for('login') }}">Login with Google</a>
                 <img src="{{ url_for('static', filename='images/myporsche.png') }}" alt="Car" class="img-fluid mb-3">
                 <h3>Car Model: Porsche 911</h3>
                 <h4>License Plate: 1234 ABC</h4>
@@ -15,10 +15,22 @@
                 <p>Transmission: 8-speed PDK</p>
                 <p>Drive Type: All-Wheel Drive</p>
             </div>
+            {% else %}
+            <div class="myvehicle mb-4">
+              <a href="{{ url_for('login') }}" class="btn-google">
+    <img src="{{ url_for('static', filename='images/logo.png') }}"
+         alt="Google logo"
+         class="google-icon">
+    Login with Google
+</a>
+            </div>
+            {% endif %}
         </div>
         <div class="col-md-6">
-            <div class="temperature mb-4">
+            <div class="temperature mb-4">   
+                {% if session.email %}
                 <h3>Environmental Data</h3>
+             
                 <div class="data-row">
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-thermometer" viewBox="0 0 16 16">
                         <path d="M8 14a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
@@ -33,8 +45,13 @@
                     </svg>
                     <h4>Current Humidity: <span id="current_humidity">--</span>%</h4>
                 </div>
-            </div>
+                  {% else %}
+<p class="mb-3">You must log in to view Environmental Data.</p>
+{% endif %}
+
+                </div>
             <div class="motion-detection mb-4">
+                {% if session.email %}
                 <h3>Security Status</h3>
                 <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-shield-shaded" viewBox="0 0 16 16">
                     <path d="M5.072 1.513a1 1 0 0 1 .856-.507h4.144a1 1 0 0 1 .856.507l.093.16a1 1 0 0 0 .514.336l.176.036a1 1 0 0 1 .743.636l.032.095a1 1 0 0 1-.031.719l-.33.659a4.993 4.993 0 0 1-.752.959l-.474.453a6.992 6.992 0 0 1-.941 1.56l-.542.786a7.998 7.998 0 0 1-.689.828L8 13.536l-.688-.792a8.008 8.008 0 0 1-.686-.829l-.542-.786a6.992 6.992 0 0 1-.941-1.56l-.474-.453a4.992 4.992 0 0 1-.752-.96l-.33-.658a1 1 0 0 1-.031-.719l.032-.095a1 1 0 0 1 .743-.636l.176-.036a1 1 0 0 0 .514-.336l.093-.16z"/>
@@ -42,14 +59,21 @@
                 <h4>Motion Detected: <span id="motion_status">No</span></h4>
                 <p>If motion is detected, the buzzer will alert you immediately.</p>
             </div>
-
+                  {% else %}
+<p class="mb-3">You must log in to view your Security Status.</p>
+{% endif %}
             <div class="cooling-system mb-4">
+                {% if session.email %}
                 <h3>Cooling System</h3>
                 <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-fan" viewBox="0 0 16 16">
                     <path d="M8 8.5A1.5 1.5 0 1 1 6.5 7a1.5 1.5 0 0 1 1.5 1.5zm0-4.474a4.472 4.472 0 0 1 1.932.456 1.5 1.5 0 0 1 2.04-.157c.59.528.755 1.354.5 2.065a4.492 4.492 0 0 1 .918 2.11 1.5 1.5 0 1 1-2.452 1.367 4.491 4.491 0 0 1-2.033.394 4.491 4.491 0 0 1-2.033-.394 1.5 1.5 0 1 1-2.452-1.367 4.492 4.492 0 0 1 .918-2.11 1.5 1.5 0 0 1 .5-2.065 1.5 1.5 0 0 1 2.04.157A4.472 4.472 0 0 1 8 4.026z"/>
                 </svg>
                 <h4>Fan Status: <span id="fan_status">Off</span></h4>
             </div>
+                              {% else %}
+<p class="mb-3">You must log in to view Cooling System.</p>
+
+{% endif %}
         </div>
     </div>
 </div>

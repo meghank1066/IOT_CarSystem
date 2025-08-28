@@ -1,0 +1,100 @@
+.btn-google {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #292433;
+    color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.btn-google:hover {
+    background-color: #1a1620;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
+
+ .slim-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 70px;
+            background: linear-gradient(135deg, #292433, #191b1f);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            
+        }
+
+        .slim-sidebar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .slim-sidebar ul {
+            margin-top: 5px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 140px;
+        }
+
+        .slim-sidebar ul li {
+            width: 100%;
+            text-align: center;
+            padding-top: 80%;
+            margin-top: 70%;
+        }
+
+        .slim-sidebar ul li a {
+            display: block;
+            text-decoration: none;
+            color: #f1f1f1;
+            font-size: 1.2rem;
+            padding: 10px;
+            transition: background 0.3s;
+        }
+
+        .slim-sidebar ul li a:hover {
+            background: #03a9f4;
+            border-radius: 50%;
+            color: #fff;
+        }
+
+        .slim-sidebar ul li a i {
+            font-size: 1.5rem;
+        }
+
+        .main-content {
+            margin-left: 80px; 
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .slim-sidebar {
+                width: 60px;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+        }

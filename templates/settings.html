@@ -1,0 +1,12 @@
+ {% extends "layout.html" %}
+{% block body %}
+  <h1>Login to Your Car App</h1>
+  <div>
+    <p>Please log in with Google to continue:</p>
+    
+    <fb:login-button
+        scope="public_profile,email"
+        onlogin="checkLoginState();">
+    </fb:login-button>
+  </div>
+{% endblock %}
