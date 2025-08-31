@@ -1,14 +1,17 @@
-from flask import Flask, render_template, session, url_for, abort, request, redirect, send_from_directory, jsonify
+from flask import Flask, render_template, session, url_for, request, redirect, send_from_directory, jsonify
 from authlib.integrations.flask_client import OAuth
 import os
 from dotenv import load_dotenv
-from authlib.integrations.flask_client import OAuth
 import mysql.connector
 from flask_session import Session
-import requests
 from pubnub.pubnub import PubNub
 from pubnub.pnconfiguration import PNConfiguration
-from pubnub.models.consumer.access_manager import PNGrantTokenResult
+from pubnub.callbacks import SubscribeCallback
+from car_options import CAR_OPTIONS
+import random
+from pi_code.motion import start_motion_monitor
+# from pi_code.fan_control import some_function
+
 
 load_dotenv()
 
@@ -23,14 +26,84 @@ pnconfig.publish_key = os.getenv("PUBNUB_PUBLISH_KEY")
 pnconfig.subscribe_key = os.getenv("PUBNUB_SUBSCRIBE_KEY")
 pnconfig.ssl = True
 pnconfig.cipher_key = os.getenv("PUBNUB_CIPHER_KEY")
-pnconfig.uuid = "server-app"
-# pnconfig.user_id = "server-app"
-
+pnconfig.uuid  = os.getenv("PUBNUB_UUID")
 pubnub = PubNub(pnconfig)
 
 
 
+# pi code
+def log_motion_event(status):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO motion_events (status) VALUES (%s)", (status,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+start_motion_monitor(pubnub, log_motion_event)
 
+
+# ##testing ref:copilot
+# import threading
+# import time
+
+# # Shared motion state
+# motion_status = "clear"
+# gpio_available = False  # Default to False
+
+# # Try importing gpiozero only if available (i.e., on Raspberry Pi)
+# try:
+#     from gpiozero import MotionSensor, LED
+#     gpio_available = True
+# except ImportError:
+#     print("GPIOZero not available — running in non-Pi mode.")
+
+# # Setup GPIO devices only if available
+# if gpio_available:
+#     green_led = LED(17)
+#     pir = MotionSensor(4)
+#     green_led.off()
+# else:
+#     green_led = None
+#     pir = None
+
+
+# # Setup
+# green_led = LED(17)
+# pir = MotionSensor(4)
+# green_led.off()
+
+# # Shared motion state
+# from gpiozero import MotionSensor, LED
+# motion_status = "clear"
+
+
+# motion_status = "clear"
+
+# def monitor_motion():
+#     global motion_status
+#     if not gpio_available:
+#         print("Skipping motion monitoring — GPIO not available.")
+#         return
+
+#     while True:
+#         pir.wait_for_motion()
+#         motion_status = "detected"
+#         green_led.on()
+#         print("Motion detected")
+#         pubnub.publish().channel("iot_channel").message({"motion": motion_status}).sync()
+#         log_motion_event(motion_status)
+
+#         pir.wait_for_no_motion()
+#         motion_status = "clear"
+#         green_led.off()
+#         print("Motion stopped")
+#         pubnub.publish().channel("iot_channel").message({"motion": motion_status}).sync()
+#         log_motion_event(motion_status)
+#         time.sleep(0.1)
+# # Start sensor monitoring in a background thread
+# motion_thread = threading.Thread(target=monitor_motion, daemon=True)
+# motion_thread.start()
 
 
 
@@ -57,8 +130,6 @@ def get_db_connection():
     )
 
 # flask app
-app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY")
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
@@ -72,23 +143,36 @@ pubnub.publish().channel("iot_channel").message({"data": "Hello IoT!"}).sync()
 
 @app.route("/pubnub/token")
 def pubnub_token():
-    token_result: PNGrantTokenResult = pubnub.grant_token() \
+   token_result = pubnub.grant_token() \
         .resources() \
         .channels({"iot_channel": {"read": True, "write": True}}) \
         .ttl(60) \
         .sync()
+   return jsonify({"token": token_result.token})
 
-    return jsonify({"token": token_result.token})
+class CarListener(SubscribeCallback):
+    def message(self, pubnub, message):
+        print("Received:", message.message)
 
+pubnub.add_listener(CarListener())
+pubnub.subscribe().channels("iot_channel").execute()
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    pubnub_subscribe_key = os.getenv("PUBNUB_SUBSCRIBE_KEY")
+    pubnub_publish_key = os.getenv("PUBNUB_PUBLISH_KEY")
+
+    car = None
     if 'user' in session:
         session['email'] = session['user']['email']
+        car = get_user_car(session['user']['sub'])
     else:
         session.pop('email', None)
-    return render_template("index.html")
 
+    return render_template("index.html", 
+                           pubnub_subscribe_key=pubnub_subscribe_key,
+                           pubnub_publish_key=pubnub_publish_key,
+                           car=car)
 
 @app.route("/send_data", methods=["POST"])
 def send_data():
@@ -114,7 +198,8 @@ def authorize():
     token = google.authorize_access_token()
     user_info = token['userinfo']
     session['user'] = user_info
-    session['email'] = user_info['email'] 
+    session['email'] = user_info['email']
+    store_user(user_info)
     return redirect(url_for('index'))
 
 @app.route("/settings")
@@ -133,22 +218,84 @@ def protected_area():
         Hello, {email}! Welcome to the protected area.
         <a href='/logout'><button>Log out</button></a>
     """
+# pi stuff 
 
-# @app.route('/facebook_login', methods=['POST'])
-# def facebook_login():
-#     data = request.get_json()
-#     access_token = data.get('accessToken')
+@app.route("/test_log")
+def test_log():
+    log_motion_event("detected")
+    return "Logged test motion event"
 
-#     validation_url = f"https://graph.facebook.com/debug_token?input_token={access_token}&access_token={app.config['FACEBOOK_APP_ID']}|{app.config['FACEBOOK_APP_SECRET']}"
-#     response = requests.get(validation_url)
-#     result = response.json()
+@app.route("/motion_status")
+def get_motion_status():
+    return jsonify({"motion": motion_status})
 
-#     if result.get('data', {}).get('is_valid'):
-#         user_info = requests.get(f'https://graph.facebook.com/me?fields=id,name,email&access_token={access_token}')
-#         user_data = user_info.json()
-#         return jsonify(user_data)
-#     else:
-#         return jsonify({'error': 'Invalid token'}), 400
+# @app.route("/fan/on")
+# def fan_on():
+#     # TODO: Add GPIO code to turn fan on
+#     pubnub.publish().channel("iot_channel").message({"fan": "on"}).sync()
+#     return jsonify({"status": "Fan turned on"})
+
+# @app.route("/fan/off")
+# def fan_off():
+#     # TODO: Add GPIO code to turn fan off
+#     pubnub.publish().channel("iot_channel").message({"fan": "off"}).sync()
+#     return jsonify({"status": "Fan turned off"})
+
+# //ref: microsoft copilot 
+
+def get_user_car(google_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT c.* FROM cars c
+        JOIN users u ON u.id = c.user_id
+        WHERE u.google_id = %s
+    """, (google_id,))
+    car = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return car
+
+def store_user(user_info):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id FROM users WHERE google_id = %s", (user_info['sub'],))
+    result = cursor.fetchone()
+
+    if not result:
+        # Insert new user
+        cursor.execute("""
+            INSERT INTO users (google_id, name, email)
+            VALUES (%s, %s, %s)
+        """, (user_info['sub'], user_info['name'], user_info['email']))
+        conn.commit()
+        user_id = cursor.lastrowid
+
+        # Pick a random car
+        car = random.choice(CAR_OPTIONS)
+
+        # Assign car to user
+        cursor.execute("""
+            INSERT INTO cars (user_id, model, license_plate, year, color, engine, transmission, drive_type)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            user_id,
+            car["model"],
+            car["license_plate"],
+            car["year"],
+            car["color"],
+            car["engine"],
+            car["transmission"],
+            car["drive_type"]
+        ))
+        conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

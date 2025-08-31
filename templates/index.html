@@ -7,13 +7,14 @@
             <div class="myvehicle mb-4">
                 <h1 class="mb-4">My Vehicle</h1>
                 <img src="{{ url_for('static', filename='images/myporsche.png') }}" alt="Car" class="img-fluid mb-3">
-                <h3>Car Model: Porsche 911</h3>
-                <h4>License Plate: 1234 ABC</h4>
-                <p>Year: 2022</p>
-                <p>Color: Black</p>
-                <p>Engine: 3.0L Twin-Turbocharged Boxer 6</p>
-                <p>Transmission: 8-speed PDK</p>
-                <p>Drive Type: All-Wheel Drive</p>
+                <h3>Car Model: {{ car.model }}</h3>
+                <h4>License Plate: {{ car.license_plate }}</h4>
+                <p>Year: {{ car.year }}</p>
+                <p>Color: {{ car.color }}</p>
+                <p>Engine: {{ car.engine }}</p>
+                <p>Transmission: {{ car.transmission }}</p>
+                <p>Drive Type: {{ car.drive_type }}</p>
+
             </div>
             {% else %}
             <div class="myvehicle mb-4">
@@ -57,6 +58,10 @@
                     <path d="M5.072 1.513a1 1 0 0 1 .856-.507h4.144a1 1 0 0 1 .856.507l.093.16a1 1 0 0 0 .514.336l.176.036a1 1 0 0 1 .743.636l.032.095a1 1 0 0 1-.031.719l-.33.659a4.993 4.993 0 0 1-.752.959l-.474.453a6.992 6.992 0 0 1-.941 1.56l-.542.786a7.998 7.998 0 0 1-.689.828L8 13.536l-.688-.792a8.008 8.008 0 0 1-.686-.829l-.542-.786a6.992 6.992 0 0 1-.941-1.56l-.474-.453a4.992 4.992 0 0 1-.752-.96l-.33-.658a1 1 0 0 1-.031-.719l.032-.095a1 1 0 0 1 .743-.636l.176-.036a1 1 0 0 0 .514-.336l.093-.16z"/>
                 </svg>
                 <h4>Motion Detected: <span id="motion_status">No</span></h4>
+                <h4>LED Status: <span id="motion_led" style="display:inline-block;width:20px;height:20px;background-color:red;border-radius:50%;"></span></h4>
+</h4>
+const ledElement = document.getElementById('motion_led');
+
                 <p>If motion is detected, the buzzer will alert you immediately.</p>
             </div>
                   {% else %}
@@ -68,12 +73,46 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-fan" viewBox="0 0 16 16">
                     <path d="M8 8.5A1.5 1.5 0 1 1 6.5 7a1.5 1.5 0 0 1 1.5 1.5zm0-4.474a4.472 4.472 0 0 1 1.932.456 1.5 1.5 0 0 1 2.04-.157c.59.528.755 1.354.5 2.065a4.492 4.492 0 0 1 .918 2.11 1.5 1.5 0 1 1-2.452 1.367 4.491 4.491 0 0 1-2.033.394 4.491 4.491 0 0 1-2.033-.394 1.5 1.5 0 1 1-2.452-1.367 4.492 4.492 0 0 1 .918-2.11 1.5 1.5 0 0 1 .5-2.065 1.5 1.5 0 0 1 2.04.157A4.472 4.472 0 0 1 8 4.026z"/>
                 </svg>
-                <h4>Fan Status: <span id="fan_status">Off</span></h4>
+               <h4>Fan Status: <span id="fan_status">Off</span></h4>
             </div>
                               {% else %}
 <p class="mb-3">You must log in to view Cooling System.</p>
 
 {% endif %}
+<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.29.11.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const pubnub = new PubNub({
+       subscribeKey: "{{ pubnub_subscribe_key }}",
+        publishKey: "{{ pubnub_publish_key }}",
+        uuid: "web_client"
+    });
+
+    pubnub.addListener({
+        message: function(event) {
+            const msg = event.message;
+            
+            // Update motion status
+           if(msg.motion !== undefined) {
+            // Update motion text
+    document.getElementById('motion_status').innerText = 
+        msg.motion === "detected" ? "Yes" : "No";
+
+   const ledElement = document.getElementById('motion_led'); // ← THIS LINE
+            if (ledElement) {
+                ledElement.style.backgroundColor = msg.motion === "detected" ? "green" : "red";
+            }
+     if (msg.fan !== undefined) {
+                document.getElementById('fan_status').innerText = msg.fan.toUpperCase();
+            }
+}
+        }
+    });
+
+    pubnub.subscribe({ channels: ['iot_channel'] });
+});
+</script>
+
         </div>
     </div>
 </div>
