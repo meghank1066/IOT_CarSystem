@@ -12,12 +12,13 @@ import random
 from pi_code.motion import start_motion_monitor
 # from pi_code.fan_control import some_function
 
+app = Flask(__name__)
 
 load_dotenv()
 
 # flask
 
-app = Flask(__name__)
+
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 # pubnub

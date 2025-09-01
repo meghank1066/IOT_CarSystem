@@ -1,0 +1,13 @@
+CREATE TABLE motion_events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    status VARCHAR(10),
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+conn = get_db_connection()
+cursor = conn.cursor()
+cursor.execute("INSERT INTO motion_events (status) VALUES (%s)", (motion_status,))
+conn.commit()
+cursor.close()
+conn.close()
