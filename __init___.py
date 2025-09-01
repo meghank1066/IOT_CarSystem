@@ -1,3 +1,8 @@
+# reference: COPILOT for helping with Google OAuth with Flask for troubleshooting and internal server issues
+# youtube reference for led with motion sensor https://youtu.be/Tw0mG4YtsZk?si=2PE-8r7R-E68B0Ai
+# stack overflow for troubleshooting aws apache mod_wsgi issues https://stackoverflow.com/questions/63912894/modulenotfounderror-with-wsgi-on-apache-server
+# copilot also helped with pubnub code (for troublshooting)
+
 import os
 import platform
 import random
